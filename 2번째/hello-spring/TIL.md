@@ -99,3 +99,83 @@ public String helloMvc(@RequestParam("name") String name, Model model){
 - 문자는 StringHttpMessageConverter가 동작한다.
 - 객체는 MappingJackson2HttpMessageConverter가 동작한다.
 - 기타 처리는 HttpMessageConverter가 동작한다.
+
+# 섹션 3
+domain
+
+repository
+- 저장소
+  - 회원 객체를 저장한다.
+  - MemberRepositoryInterface
+  - repository를 만들면 구현체를 만들어야 한다.
+    - MemoryMemberRepository
+
+MemberRepository.java
+```java
+package hello.hellospring.repository;
+
+import hello.hellospring.domain.Member;
+
+
+import java.util.List;
+import java.util.Optional;
+
+public interface MemberRepository {
+    // 회원 저장
+    Member save(Member member);
+    // 회원 검색
+    Optional<Member> findById(Long id);
+    Optional<Member> findByName(String name);
+    // 모든 회원 반환
+    List<Member> findAll();
+}
+```
+
+MemoryMemberRepository.java
+- 실제로 구현
+```java
+package hello.hellospring.repository;
+
+import hello.hellospring.domain.Member;
+
+import java.util.*;
+
+public class MemoryMemberRepository implements MemberRepository{
+    private static Map<Long, Member> store = new HashMap<>();
+    private static long sequence = 0L;
+
+    @Override
+    public Member save(Member member) {
+        member.setId(++sequence);
+        store.put(member.getId(), member);
+        return member;
+
+    }
+
+    @Override
+    public Optional<Member> findById(Long id) {
+        return Optional.ofNullable(store.get(id));
+    }
+
+    @Override
+    public Optional<Member> findByName(String name) {
+        return store.values().stream()
+                .filter(member -> member.getName().equals(name))
+                .findAny();
+        // findAny는 하나라도 찾는다라는 의미이다.
+        // 즉, member에서 하나라도 찾으면 return 한다.
+        // 이 결과가 Optional로 반환된다.
+    }
+
+    @Override
+    public List<Member> findAll() {
+        return new ArrayList<>(store.values());
+    }
+}
+
+
+```
+
+Optional
+- java8에서 null을 처리하는 방법
+  - null을 감싸서 반환한다.
