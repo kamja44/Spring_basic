@@ -179,3 +179,62 @@ public class MemoryMemberRepository implements MemberRepository{
 Optional
 - java8에서 null을 처리하는 방법
   - null을 감싸서 반환한다.
+
+@AfterEach
+- 메서드가 실행이 끝날때 마다 동작한다.
+```java
+@AfterEach
+    public void afterEach(){
+        repository.clearStore();
+    }
+```
+- 하나의 테스트가 끝날 때마다 저장소를 비워주기 위해 사용했다.
+
+store.clear
+- 저장소를 비운다.
+```java
+    public void clearStore(){
+        store.clear();
+    }
+```
+
+null이 있을 수 있으면 optional로 감싸서 반환한다.
+```java
+        Optional<Member> result = memberRepository.findByName(member.getName());
+        result.ifPresent(m -> {
+            throw new IllegalStateException("이미 존재하는 회원입니다.");
+        });
+```
+
+# 섹션 4
+스프링 빈 등록하는 2가지 방법
+1. 컴포넌트 스캔과 자동 의존관계 설정
+- @Component 어노테이션이 있으면 스프링 빈으로 자동 등록된다.
+  - @Service, @Repository, @Controller 안에 @Component가 정의되어있음
+- @Autowired
+2. 자바 코드로 직접 스프링 빈 등록
+- SpringConfig 파일 생성
+  - @Bean으로 직접 등록
+```java
+package hello.hellospring;
+
+import hello.hellospring.repository.MemberRepository;
+import hello.hellospring.repository.MemoryMemberRepository;
+import hello.hellospring.service.MemberService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SpringConfig {
+    @Bean
+    public MemberService memberService(){
+        return new MemberService(memberRepository());
+    }
+    @Bean
+    public MemberRepository memberRepository() {
+        return new MemoryMemberRepository();
+    }
+
+
+}
+```
