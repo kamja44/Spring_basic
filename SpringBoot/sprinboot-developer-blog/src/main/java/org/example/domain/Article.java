@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -46,5 +50,14 @@ public class Article {
         return content;
     }
     */
+    /**
+     * @CreatedAt 애너테이션을 사용하면 엔티티가 생성될 때 생성 시간을 created_at 컬럼에 저장한다.
+     * */
+    @CreatedDate // 엔티티가 생성될 떄 생성 시간 저장
+    @Column(name="created_at")
+    private LocalDateTime createdAt;
 
+    @LastModifiedDate // 엔티티가 수정될 때 수정 ㅣ간 저장
+    @Column(name="updated_at")
+    private LocalDateTime updatedAt;
 }

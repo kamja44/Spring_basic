@@ -20,6 +20,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // thymeleaf 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 test {
