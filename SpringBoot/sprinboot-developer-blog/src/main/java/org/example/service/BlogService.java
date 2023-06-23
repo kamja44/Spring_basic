@@ -6,6 +6,7 @@ import org.example.domain.Article;
 import org.example.dto.AddArticleRequest;
 import org.example.dto.UpdateArticleRequest;
 import org.example.repository.BlogRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +17,8 @@ public class BlogService {
     private final BlogRepository blogRepository;
 
     // 블로그 글 추가 메서드
-    public Article save(AddArticleRequest request){
-        return blogRepository.save(request.toEntity());
+    public Article save(AddArticleRequest request, String userName){
+        return blogRepository.save(request.toEntity(userName));
     }
 
     // DB에 저장되어 있는 글을 모두 가져오는 findAll() 메서드 추가
@@ -31,7 +32,11 @@ public class BlogService {
     }
     // 블로그 글 삭제
     public void delete(long id){
-        blogRepository.deleteById(id);
+        Article article = blogRepository.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("not found : "+id));
+        authorizeArticleAuthor(article);
+        blogRepository.delete(article);
+
     }
     /**
      * @Transactional 애너테이션은 매칭한 메서드를 하나의 트랜잭션으로 묶는 역할을 한다.
@@ -43,8 +48,18 @@ public class BlogService {
         Article article = blogRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: "+id));
 
+        authorizeArticleAuthor(article);
         article.update(request.getTitle(), request.getContent());
 
         return article;
+    }
+
+
+    // 게시글을 작성한 유저인지 확인
+    private static void authorizeArticleAuthor(Article article){
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(!article.getAuthor().equals(userName)){
+            throw new IllegalArgumentException("not authorized");
+        }
     }
 }

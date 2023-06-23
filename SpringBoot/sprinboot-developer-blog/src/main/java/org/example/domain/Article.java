@@ -25,8 +25,21 @@ public class Article {
     @Column(name="content", nullable = false)
     private String content;
 
+    @CreatedDate // 엔티티가 생성될 떄 생성 시간 저장
+    @Column(name="created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate // 엔티티가 수정될 때 수정 ㅣ간 저장
+    @Column(name="updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "author", nullable = false)
+    private String author;
+
+
     @Builder // 빌더패턴으로 객체생성
-    public Article(String title, String content){
+    public Article(String author, String title, String content){
+        this.author = author;
         this.title = title;
         this.content = content;
     }
@@ -34,6 +47,8 @@ public class Article {
         this.title = title;
         this.content = content;
     }
+
+
     /**
      * protected Article(){}은 NoArgsConstructor(access = AccessLevel.PROTECTED)로 대체한다.
      * GETTER 함수들은 class 위에 @Getter 애네테이션으로 대체한다.
@@ -53,11 +68,5 @@ public class Article {
     /**
      * @CreatedAt 애너테이션을 사용하면 엔티티가 생성될 때 생성 시간을 created_at 컬럼에 저장한다.
      * */
-    @CreatedDate // 엔티티가 생성될 떄 생성 시간 저장
-    @Column(name="created_at")
-    private LocalDateTime createdAt;
 
-    @LastModifiedDate // 엔티티가 수정될 때 수정 ㅣ간 저장
-    @Column(name="updated_at")
-    private LocalDateTime updatedAt;
 }
